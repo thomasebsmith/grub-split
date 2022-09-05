@@ -1,6 +1,7 @@
+use std::fmt;
 use std::ops::Add;
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Address(usize);
 
 impl Address {
@@ -21,7 +22,13 @@ impl Add<usize> for Address {
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+impl fmt::Display for Address {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "0x{:x}", self.0)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AddressRange<const NUM_BYTES: usize> {
     pub start: Address,
 }
@@ -36,7 +43,7 @@ impl<const NUM_BYTES: usize> AddressRange<NUM_BYTES> {
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct VariableLengthAddressRange {
     pub start: Address,
     pub num_bytes: usize,
