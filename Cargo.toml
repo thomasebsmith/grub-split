@@ -1,7 +1,8 @@
 [package]
-name = "GrubSplit"
+name = "grub-split"
 version = "0.1.0"
 authors = ["Thomas Smith"]
 edition = "2021"
 
 [dependencies]
+read-process-memory = "0.1.4"
