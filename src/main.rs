@@ -1,8 +1,8 @@
 use std::error::Error;
 use std::io;
 
-use crate::memory::{Address, AddressRange, MemoryReader};
 use crate::memory::external::ExternalMemoryReader;
+use crate::memory::{Address, AddressRange, MemoryReader};
 
 pub mod memory;
 
@@ -28,16 +28,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     let pid: i32 = args[1].parse()?;
     let mut reader = ExternalMemoryReader::from_pid(pid)?;
     let addr: usize = usize::from_str_radix(
-        args[2].strip_prefix("0x")
+        args[2]
+            .strip_prefix("0x")
             .ok_or_else(|| invalid_input("expected hexadecimal address"))?,
-        16
+        16,
     )?;
 
     println!("Reading 8 bytes at address {} from {}", addr, pid);
-    let result = reader.read(
-        AddressRange{start: Address::new(addr), num_bytes: 8}
-    )?;
-    let hex = result.iter()
+    let result = reader.read(AddressRange::<8> {
+        start: Address::new(addr),
+    })?;
+    let hex = result
+        .iter()
         .map(|byte| format!("{:02X}", byte))
         .collect::<String>();
     println!("{}", hex);

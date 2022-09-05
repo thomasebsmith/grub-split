@@ -1,3 +1,3 @@
 mod reader;
 
-pub use reader::{ExternalMemoryReader};
+pub use reader::ExternalMemoryReader;
