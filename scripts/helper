@@ -1,0 +1,51 @@
+#!/bin/sh
+
+target_dir='./target'
+binary_name='grub-split'
+
+update_binary_path() {
+  binary_path="$target_dir/$profile/$binary_name"
+}
+
+cargo_args=''
+profile='debug'
+update_binary_path
+
+set_cargo_release() {
+  cargo_args='--release'
+  profile='release'
+  update_binary_path
+}
+
+parse_build_args() {
+  original_num_args="$#"
+  release_set=0
+
+  while [ "$#" -gt 0 ]; do
+    if [ "$#" -ge 1 ]; then
+      arg="$1"
+      shift
+      case "$arg" in
+        --release)
+          if [ "$release_set" -eq 1 ]; then
+            >&2 usage
+            exit 1
+          fi
+          set_cargo_release
+          release_set=1
+          ;;
+        --)
+          break
+          ;;
+        *)
+          >&2 usage
+          exit 1
+      esac
+    fi
+  done
+
+  num_leftover_args="$#"
+  num_parsed_args="$((original_num_args - num_leftover_args))"
+}
+
+os="$(uname -s)"

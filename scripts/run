@@ -1,0 +1,15 @@
+#!/bin/sh
+
+CDPATH='' cd -- "$(dirname -- "$(dirname -- "$0")")" || exit 1
+
+. ./scripts/helper
+
+usage() {
+  echo "usage: $0 [--release] [-- <arguments...>]"
+}
+
+parse_build_args "$@"
+shift "$num_parsed_args"
+
+./scripts/build $cargo_args || exit 1
+"$binary_path" "$@"

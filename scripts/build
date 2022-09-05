@@ -1,0 +1,33 @@
+#!/bin/sh
+
+CDPATH='' cd -- "$(dirname -- "$(dirname -- "$0")")" || exit 1
+
+. ./scripts/helper
+
+usage() {
+  echo "usage: $0 [--release]"
+}
+
+parse_build_args "$@"
+if [ "$num_leftover_args" -gt 0 ]; then
+  >&2 usage
+  exit 1
+fi
+
+cargo build $cargo_args || exit 1
+
+if [ -n "$GRUBSPLIT_CODESIGN_IDENTITY" ]; then
+  entitlements='./entitlements.plist'
+
+  # Sign the binary if it isn't already signed
+  if ! codesign --display "$binary_path" >/dev/null 2>&1; then
+    codesign --sign "$GRUBSPLIT_CODESIGN_IDENTITY" \
+      --entitlements "$entitlements" \
+      "$binary_path" || exit 1
+  else
+    echo "$binary_path is already signed"
+  fi
+elif [ "$os" = 'Darwin' ]; then
+  >&2 echo "Warning: producing unsigned binary" \
+    "(GRUBSPLIT_CODESIGN_IDENTITY is empty or unset)"
+fi
