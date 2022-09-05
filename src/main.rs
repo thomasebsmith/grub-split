@@ -4,6 +4,7 @@ use std::io;
 use crate::memory::external::ExternalMemoryReader;
 use crate::memory::{Address, AddressRange, MemoryReader};
 
+pub mod deserialize;
 pub mod memory;
 
 fn invalid_input(desc: &str) -> io::Error {
