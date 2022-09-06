@@ -24,6 +24,9 @@ impl<T: Deserialize> Ptr<T> {
 }
 
 impl<T: Deserialize> Deserialize for Option<Ptr<T>> {
+    const NUM_BYTES: usize = PTR_NUM_BYTES;
+    const ALIGNMENT: usize = Self::NUM_BYTES;
+
     fn deserialize<M: MemoryReader>(
         reader: &mut M,
         address: Address,
@@ -42,6 +45,9 @@ impl<T: Deserialize> Deserialize for Option<Ptr<T>> {
 }
 
 impl<T: Deserialize> Deserialize for Ptr<T> {
+    const NUM_BYTES: usize = PTR_NUM_BYTES;
+    const ALIGNMENT: usize = Self::NUM_BYTES;
+
     fn deserialize<M: MemoryReader>(
         reader: &mut M,
         address: Address,
