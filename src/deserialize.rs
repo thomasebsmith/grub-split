@@ -1,3 +1,4 @@
+mod array;
 mod deserialize;
 mod error;
 mod ptr;

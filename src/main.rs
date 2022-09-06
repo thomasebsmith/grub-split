@@ -1,3 +1,5 @@
+#![feature(array_try_from_fn)]
+
 use std::error::Error;
 use std::io;
 

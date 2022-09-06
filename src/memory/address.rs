@@ -5,12 +5,19 @@ use std::ops::Add;
 pub struct Address(usize);
 
 impl Address {
-    pub fn new(raw: usize) -> Self {
+    pub const fn new(raw: usize) -> Self {
         Self(raw)
     }
 
-    pub fn raw(self) -> usize {
+    pub const fn raw(self) -> usize {
         self.0
+    }
+
+    pub const fn align_forward(self, alignment: usize) -> Self {
+        let alignment_mask = alignment - 1;
+        let addr_in_correct_block = self.0 + alignment_mask;
+        let addr_aligned = addr_in_correct_block & !alignment_mask;
+        Self(addr_aligned)
     }
 }
 

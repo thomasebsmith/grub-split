@@ -1,4 +1,4 @@
-use std::mem::size_of;
+use std::mem::{align_of, size_of};
 
 use crate::memory::{Address, AddressRange, MemoryReader};
 
@@ -18,7 +18,7 @@ macro_rules! deserialize_int_impl {
     ($T:ty) => {
         impl Deserialize for $T {
             const NUM_BYTES: usize = size_of::<$T>();
-            const ALIGNMENT: usize = Self::NUM_BYTES;
+            const ALIGNMENT: usize = align_of::<$T>();
 
             fn deserialize<M: MemoryReader>(
                 reader: &mut M,

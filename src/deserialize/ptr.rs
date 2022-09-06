@@ -7,6 +7,7 @@ use super::Deserialize;
 use super::Error as DeserializeError;
 
 const PTR_NUM_BYTES: usize = std::mem::size_of::<usize>();
+const PTR_ALIGNMENT: usize = std::mem::align_of::<usize>();
 
 #[derive(Debug)]
 pub struct Ptr<T: Deserialize> {
@@ -25,7 +26,7 @@ impl<T: Deserialize> Ptr<T> {
 
 impl<T: Deserialize> Deserialize for Option<Ptr<T>> {
     const NUM_BYTES: usize = PTR_NUM_BYTES;
-    const ALIGNMENT: usize = Self::NUM_BYTES;
+    const ALIGNMENT: usize = PTR_ALIGNMENT;
 
     fn deserialize<M: MemoryReader>(
         reader: &mut M,
@@ -46,7 +47,7 @@ impl<T: Deserialize> Deserialize for Option<Ptr<T>> {
 
 impl<T: Deserialize> Deserialize for Ptr<T> {
     const NUM_BYTES: usize = PTR_NUM_BYTES;
-    const ALIGNMENT: usize = Self::NUM_BYTES;
+    const ALIGNMENT: usize = PTR_ALIGNMENT;
 
     fn deserialize<M: MemoryReader>(
         reader: &mut M,
