@@ -1,14 +1,9 @@
-#![feature(array_try_from_fn)]
-
 use std::error::Error;
 use std::io;
 
-use crate::deserialize::{Deserialize, Ptr};
-use crate::memory::external::ExternalMemoryReader;
-use crate::memory::Address;
-
-pub mod deserialize;
-pub mod memory;
+use grub_split_library::deserialize::{Deserialize, Ptr};
+use grub_split_library::memory::external::ExternalMemoryReader;
+use grub_split_library::memory::Address;
 
 fn invalid_input(desc: &str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidInput, desc)
@@ -21,6 +16,14 @@ fn usage(args: &[String]) -> io::Result<()> {
         eprintln!("Usage: <executable> <pid> <addr>");
     }
     Err(invalid_input("bad args"))
+}
+
+#[derive(Deserialize)]
+struct ExternalData {
+    x: usize,
+    y: i32,
+    z: i16,
+    a: Ptr<u8>,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -39,8 +42,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     )?);
 
     println!("Reading pointer at address {} from {}", addr, pid);
-    let ptr = Ptr::<u64>::deserialize(&mut reader, addr)?;
-    println!("pointer address is {:?}", ptr);
-    println!("pointer content is {}", ptr.deref(&mut reader)?);
+    let data = ExternalData::deserialize(&mut reader, addr)?;
+    println!("x is {}", data.x);
+    println!("y is {}", data.y);
+    println!("z is {}", data.z);
+    println!("a is {:?}", data.a);
+    println!("*a is {}", data.a.deref(&mut reader)?);
     Ok(())
 }

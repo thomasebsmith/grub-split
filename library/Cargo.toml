@@ -1,0 +1,10 @@
+[package]
+name = "grub-split-library"
+version = "0.1.0"
+authors = ["Thomas Smith"]
+edition = "2021"
+
+[dependencies]
+grub-split-macros = { path = "../macros" }
+
+read-process-memory = "0.1.4"

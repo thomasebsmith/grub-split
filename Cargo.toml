@@ -5,4 +5,4 @@ authors = ["Thomas Smith"]
 edition = "2021"
 
 [dependencies]
-read-process-memory = "0.1.4"
+grub-split-library = { path = "library" }

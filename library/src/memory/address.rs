@@ -19,13 +19,18 @@ impl Address {
         let addr_aligned = addr_in_correct_block & !alignment_mask;
         Self(addr_aligned)
     }
+
+    // const_ops would be nice...
+    pub const fn add_const(self, offset: usize) -> Self {
+        Self(self.0 + offset)
+    }
 }
 
 impl Add<usize> for Address {
     type Output = Self;
 
     fn add(self, offset: usize) -> Self {
-        Self(self.0 + offset)
+        self.add_const(offset)
     }
 }
 

@@ -4,6 +4,8 @@ use crate::memory::{Address, AddressRange, MemoryReader};
 
 use super::Error as DeserializeError;
 
+pub use grub_split_macros::*;
+
 pub trait Deserialize: Sized {
     const NUM_BYTES: usize;
     const ALIGNMENT: usize;
@@ -40,3 +42,5 @@ deserialize_int_impl!(u32);
 deserialize_int_impl!(i32);
 deserialize_int_impl!(u64);
 deserialize_int_impl!(i64);
+deserialize_int_impl!(usize);
+deserialize_int_impl!(isize);
