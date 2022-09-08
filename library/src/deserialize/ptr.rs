@@ -1,5 +1,4 @@
 use std::marker::PhantomData;
-use std::option::Option;
 
 use crate::memory::{Address, AddressRange, MemoryReader};
 
@@ -9,6 +8,19 @@ use super::Error as DeserializeError;
 pub const PTR_NUM_BYTES: usize = std::mem::size_of::<usize>();
 pub const PTR_ALIGNMENT: usize = std::mem::align_of::<usize>();
 
+pub fn read_ptr<M: MemoryReader>(
+    reader: &mut M,
+    address: Address,
+) -> Result<Option<Address>, DeserializeError> {
+    let range = AddressRange::<PTR_NUM_BYTES> { start: address };
+    let addr_raw = usize::from_ne_bytes(reader.read(range)?);
+    Ok(if addr_raw == 0 {
+        None
+    } else {
+        Some(Address::new(addr_raw))
+    })
+}
+
 #[derive(Debug)]
 pub struct Ptr<T: Deserialize> {
     address: Address,
@@ -17,7 +29,7 @@ pub struct Ptr<T: Deserialize> {
 
 impl<T: Deserialize> Ptr<T> {
     pub fn deref<M: MemoryReader>(
-        self,
+        &self,
         reader: &mut M,
     ) -> Result<T, DeserializeError> {
         T::deserialize(reader, self.address)
@@ -32,16 +44,10 @@ impl<T: Deserialize> Deserialize for Option<Ptr<T>> {
         reader: &mut M,
         address: Address,
     ) -> Result<Self, DeserializeError> {
-        let range = AddressRange::<PTR_NUM_BYTES> { start: address };
-        let addr_raw = usize::from_ne_bytes(reader.read(range)?);
-        Ok(if addr_raw == 0 {
-            None
-        } else {
-            Some(Ptr {
-                address: Address::new(addr_raw),
-                deref_type: PhantomData,
-            })
-        })
+        Ok(read_ptr(reader, address)?.map(|pointed_addr| Ptr {
+            address: pointed_addr,
+            deref_type: PhantomData,
+        }))
     }
 }
 
@@ -54,7 +60,7 @@ impl<T: Deserialize> Deserialize for Ptr<T> {
         address: Address,
     ) -> Result<Self, DeserializeError> {
         match Option::<Ptr<T>>::deserialize(reader, address)? {
-            Some(addr) => Ok(addr),
+            Some(ptr) => Ok(ptr),
             None => Err(DeserializeError::NullPtrError(address)),
         }
     }

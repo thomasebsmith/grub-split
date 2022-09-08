@@ -4,7 +4,7 @@ use crate::memory::{Address, AddressRange, MemoryReader};
 
 use super::Deserialize;
 use super::Error as DeserializeError;
-use super::ptr::{PTR_ALIGNMENT, PTR_NUM_BYTES};
+use super::ptr::{read_ptr, PTR_ALIGNMENT, PTR_NUM_BYTES};
 
 const MAX_STRING_LENGTH: usize = 1024 * 1024;
 
@@ -25,7 +25,7 @@ fn read_c_string<M: MemoryReader>(
         }
 
         match next_addr.checked_add(1) {
-            None => break,
+            None => return Err(DeserializeError::AddressOverflowError(address)),
             Some(addr) => next_addr = addr,
         };
     }
@@ -41,14 +41,10 @@ impl Deserialize for Option<String> {
         reader: &mut M,
         address: Address,
     ) -> Result<Self, DeserializeError> {
-        let ptr_range = AddressRange::<PTR_NUM_BYTES> { start: address };
-        let addr_raw = usize::from_ne_bytes(reader.read(ptr_range)?);
-
-        Ok(if addr_raw == 0 {
-            None
-        } else {
-            Some(read_c_string(reader, Address::new(addr_raw))?)
-        })
+        match read_ptr(reader, address)? {
+            None => Ok(None),
+            Some(pointed_addr) => read_c_string(reader, pointed_addr).map(Some),
+        }
     }
 }
 

@@ -7,6 +7,7 @@ use crate::memory::Address;
 
 #[derive(Debug)]
 pub enum Error {
+    AddressOverflowError(Address),
     EncodingError(Utf8Error),
     IoError(io::Error),
     NullPtrError(Address),
@@ -16,6 +17,9 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
+            Self::AddressOverflowError(address) => {
+                write!(f, "Overflow in address range starting at {}", address)
+            }
             Self::EncodingError(encoding_error) => encoding_error.fmt(f),
             Self::IoError(io_error) => io_error.fmt(f),
             Self::NullPtrError(address) => {
