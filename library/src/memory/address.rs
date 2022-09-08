@@ -24,6 +24,13 @@ impl Address {
     pub const fn add_const(self, offset: usize) -> Self {
         Self(self.0 + offset)
     }
+
+    pub const fn checked_add(self, offset: usize) -> Option<Self> {
+        match self.0.checked_add(offset) {
+            None => None,
+            Some(new_raw_addr) => Some(Self(new_raw_addr)),
+        }
+    }
 }
 
 impl Add<usize> for Address {

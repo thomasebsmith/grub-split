@@ -6,8 +6,8 @@ use crate::memory::{Address, AddressRange, MemoryReader};
 use super::Deserialize;
 use super::Error as DeserializeError;
 
-const PTR_NUM_BYTES: usize = std::mem::size_of::<usize>();
-const PTR_ALIGNMENT: usize = std::mem::align_of::<usize>();
+pub const PTR_NUM_BYTES: usize = std::mem::size_of::<usize>();
+pub const PTR_ALIGNMENT: usize = std::mem::align_of::<usize>();
 
 #[derive(Debug)]
 pub struct Ptr<T: Deserialize> {

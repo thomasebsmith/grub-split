@@ -24,6 +24,7 @@ struct ExternalData {
     y: i32,
     z: i16,
     a: Ptr<u8>,
+    s: String,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -48,5 +49,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("z is {}", data.z);
     println!("a is {:?}", data.a);
     println!("*a is {}", data.a.deref(&mut reader)?);
+    println!("s is \"{}\"", &data.s);
     Ok(())
 }
