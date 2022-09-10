@@ -1,6 +1,8 @@
 # GrubSplit
 GrubSplit is an autosplitter for Hollow Knight that supports macOS and Linux.
-It is written in Rust and licensed under the MIT License.
+It is written in Rust and is available under the MIT License.
+
+See [LICENSE](./LICENSE) and [THIRD\_PARTY](./THIRD_PARTY) for license details.
 
 ## Quick Start
 ```sh
@@ -18,7 +20,7 @@ $ ./scripts/run.sh -- <pid> # (replace <pid> with a process ID to attach to)
 - Basic autosplitting functionality on macOS
 
 ### v0.3
-- Improved timer integrations, possibily including LiveSplit integration
+- Improved timer integrations, possibly including LiveSplit integration
 
 ### v0.4
 - Basic autosplitting functionality on Linux
