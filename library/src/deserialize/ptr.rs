@@ -4,6 +4,7 @@ use crate::memory::{Address, AddressRange, MemoryReader};
 
 use super::Deserialize;
 use super::Error as DeserializeError;
+use super::LazyDeserialize;
 
 pub const PTR_NUM_BYTES: usize = std::mem::size_of::<usize>();
 pub const PTR_ALIGNMENT: usize = std::mem::align_of::<usize>();
@@ -27,8 +28,8 @@ pub struct Ptr<T: Deserialize> {
     deref_type: PhantomData<T>,
 }
 
-impl<T: Deserialize> Ptr<T> {
-    pub fn deref<M: MemoryReader>(
+impl<T: Deserialize> LazyDeserialize<T> for Ptr<T> {
+    fn deref<M: MemoryReader>(
         &self,
         reader: &mut M,
     ) -> Result<T, DeserializeError> {

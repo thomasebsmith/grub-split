@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::io;
 
-use grub_split_library::deserialize::{Deserialize, Ptr};
+use grub_split_library::deserialize::{Deserialize, LazyDeserialize, Ptr};
 use grub_split_library::memory::external::ExternalMemoryReader;
 use grub_split_library::memory::Address;
 
