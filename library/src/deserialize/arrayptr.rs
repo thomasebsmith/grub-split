@@ -29,7 +29,9 @@ impl<T: Deserialize> ArrayPtr<T> {
         reader: &mut M,
         size: usize,
     ) -> Result<Vec<T>, DeserializeError> {
-        (0..size).map(|index| self.nth_element(reader, index)).collect()
+        (0..size)
+            .map(|index| self.nth_element(reader, index))
+            .collect()
     }
 }
 

@@ -2,9 +2,9 @@ use std::option::Option;
 
 use crate::memory::{Address, AddressRange, MemoryReader};
 
+use super::ptr::{read_ptr, PTR_ALIGNMENT, PTR_NUM_BYTES};
 use super::Deserialize;
 use super::Error as DeserializeError;
-use super::ptr::{read_ptr, PTR_ALIGNMENT, PTR_NUM_BYTES};
 
 const MAX_STRING_LENGTH: usize = 1024 * 1024;
 
@@ -25,7 +25,9 @@ fn read_c_string<M: MemoryReader>(
         }
 
         match next_addr.checked_add(1) {
-            None => return Err(DeserializeError::AddressOverflowError(address)),
+            None => {
+                return Err(DeserializeError::AddressOverflowError(address))
+            }
             Some(addr) => next_addr = addr,
         };
     }
