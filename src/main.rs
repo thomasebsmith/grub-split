@@ -1,7 +1,9 @@
 use std::error::Error;
 use std::io;
 
-use grub_split_library::deserialize::{Deserialize, LazyDeserialize, Ptr};
+use grub_split_library::deserialize::{
+    Deserialize, Eager, LazyDeserialize, Ptr,
+};
 use grub_split_library::memory::external::ExternalMemoryReader;
 use grub_split_library::memory::Address;
 
@@ -24,6 +26,7 @@ struct ExternalData {
     y: i32,
     z: i16,
     a: Ptr<u8>,
+    b: Eager<Ptr<u64>>,
     s: String,
 }
 
@@ -49,6 +52,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("z is {}", data.z);
     println!("a is {:?}", data.a);
     println!("*a is {}", data.a.deref(&mut reader)?);
+    println!("b is {}", data.b.value);
     println!("s is \"{}\"", &data.s);
     Ok(())
 }

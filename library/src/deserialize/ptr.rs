@@ -28,11 +28,13 @@ pub struct Ptr<T: Deserialize> {
     deref_type: PhantomData<T>,
 }
 
-impl<T: Deserialize> LazyDeserialize<T> for Ptr<T> {
+impl<T: Deserialize> LazyDeserialize for Ptr<T> {
+    type Deserialized = T;
+
     fn deref<M: MemoryReader>(
         &self,
         reader: &mut M,
-    ) -> Result<T, DeserializeError> {
+    ) -> Result<Self::Deserialized, DeserializeError> {
         T::deserialize(reader, self.address)
     }
 }
