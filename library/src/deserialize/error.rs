@@ -1,4 +1,5 @@
-use std::convert::From;
+use core::convert::{From, Infallible};
+use std::num::TryFromIntError;
 use std::str::Utf8Error;
 use std::string::FromUtf8Error;
 use std::{error, fmt, io};
@@ -9,6 +10,7 @@ use crate::memory::Address;
 pub enum Error {
     AddressOverflowError(Address),
     EncodingError(Utf8Error),
+    IntConversionError(TryFromIntError),
     IoError(io::Error),
     NullPtrError(Address),
     UnterminatedCStringError(Address),
@@ -21,6 +23,7 @@ impl fmt::Display for Error {
                 write!(f, "Overflow in address range starting at {}", address)
             }
             Self::EncodingError(encoding_error) => encoding_error.fmt(f),
+            Self::IntConversionError(convert_error) => convert_error.fmt(f),
             Self::IoError(io_error) => io_error.fmt(f),
             Self::NullPtrError(address) => {
                 write!(f, "Unexpected null pointer at {}", address)
@@ -49,5 +52,17 @@ impl From<Utf8Error> for Error {
 impl From<FromUtf8Error> for Error {
     fn from(error: FromUtf8Error) -> Self {
         Error::EncodingError(error.utf8_error())
+    }
+}
+
+impl From<TryFromIntError> for Error {
+    fn from(error: TryFromIntError) -> Self {
+        Error::IntConversionError(error)
+    }
+}
+
+impl From<Infallible> for Error {
+    fn from(_: Infallible) -> Self {
+        panic!("Infallible error encountered");
     }
 }
