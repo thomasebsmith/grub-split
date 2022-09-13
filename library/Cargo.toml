@@ -7,4 +7,5 @@ edition = "2021"
 [dependencies]
 grub-split-macros = { path = "../macros" }
 
+proc-maps = "0.2.1"
 read-process-memory = "0.1.4"

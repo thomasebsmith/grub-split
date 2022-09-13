@@ -1,10 +1,6 @@
 use std::io;
 
-use super::address::{Address, AddressRange, VariableLengthAddressRange};
-
-pub trait MemoryLocator {
-    fn locate(&mut self, library: &str) -> io::Result<Address>;
-}
+use super::address::{AddressRange, VariableLengthAddressRange};
 
 pub trait MemoryReader {
     fn read_vec(
