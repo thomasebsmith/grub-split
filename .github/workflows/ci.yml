@@ -12,19 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Install toolchain
+      run: rustup toolchain install nightly --profile minimal
     - name: Build
       run: cargo build --verbose
   build-release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Install toolchain
+      run: rustup toolchain install nightly --profile minimal
     - name: Build
       run: cargo build --release --verbose
   check-format:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Install rustfmt
-      run: rustup component add rustfmt --toolchain nightly
+    - name: Install toolchain
+      run: rustup toolchain install nightly
     - name: Check format
       run: cargo fmt --check --all --verbose
