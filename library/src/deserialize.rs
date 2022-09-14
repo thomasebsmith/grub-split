@@ -1,6 +1,6 @@
 mod array;
 mod arrayptr;
-mod deserialize;
+mod deserializetrait;
 mod eager;
 mod error;
 mod lazy;
@@ -10,7 +10,7 @@ mod ptr;
 mod string;
 
 pub use arrayptr::ArrayPtr;
-pub use deserialize::Deserialize;
+pub use deserializetrait::Deserialize;
 pub use eager::Eager;
 pub use error::Error;
 pub use lazy::LazyDeserialize;

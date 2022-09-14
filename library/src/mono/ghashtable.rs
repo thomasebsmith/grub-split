@@ -17,11 +17,15 @@ struct KeyValuePair<K: Deserialize + MonoHash + Eq, V: Deserialize> {
 
 type Slot<K, V> = LinkedList<KeyValuePair<K, V>>;
 
+type SlotPtr<K, V> = Option<Ptr<Slot<K, V>>>;
+
+type SlotArray<K, V> = Eager<PostSizedArray<Eager<SlotPtr<K, V>>, i32>>;
+
 #[derive(Deserialize)]
 pub struct GHashTable<K: Deserialize + MonoHash + Eq, V: Deserialize> {
     _hash_func: usize,
     _key_equal_func: usize,
-    table: Eager<PostSizedArray<Eager<Option<Ptr<Slot<K, V>>>>, i32>>,
+    table: SlotArray<K, V>,
     _in_use: i32,
     _threshold: i32,
     _last_rehash: i32,

@@ -26,9 +26,9 @@ pub fn derive_deserialize(
     let generics = add_trait_bounds(input.generics);
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let num_bytes = num_bytes_const(&struct_data);
-    let alignment = alignment_const(&struct_data);
-    let create_struct = create_struct_expr(&struct_data);
+    let num_bytes = num_bytes_const(struct_data);
+    let alignment = alignment_const(struct_data);
+    let create_struct = create_struct_expr(struct_data);
 
     let expanded = quote! {
         impl #impl_generics grub_split_library::deserialize::Deserialize for #struct_name #ty_generics #where_clause {

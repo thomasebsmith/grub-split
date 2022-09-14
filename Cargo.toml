@@ -4,5 +4,7 @@ version = "0.1.0"
 authors = ["Thomas Smith"]
 edition = "2021"
 
+[workspace]
+
 [dependencies]
 grub-split-library = { path = "library" }

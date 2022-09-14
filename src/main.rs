@@ -12,7 +12,7 @@ fn invalid_input(desc: &str) -> io::Error {
 }
 
 fn usage(args: &[String]) -> io::Result<()> {
-    if args.len() >= 1 {
+    if !args.is_empty() {
         eprintln!("Usage: {} <pid> <addr>", args[0]);
     } else {
         eprintln!("Usage: <executable> <pid> <addr>");
