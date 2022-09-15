@@ -34,14 +34,14 @@ pub struct GHashTable<K: Deserialize + MonoHash + Eq, V: Deserialize> {
 }
 
 impl<K: Deserialize + MonoHash + Eq, V: Deserialize> GHashTable<K, V> {
-    pub fn get(&self, key: K) -> Option<&V> {
+    pub fn get(&self, key: &K) -> Option<&V> {
         let bucket = (key.hash() as usize) % self.table.value.len();
         let maybe_slot = &self.table.value[bucket].value;
         match maybe_slot {
             None => None,
             Some(slot) => {
                 for pair in slot.iter() {
-                    if pair.key == key {
+                    if pair.key == *key {
                         return Some(&pair.value);
                     }
                 }

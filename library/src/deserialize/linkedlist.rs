@@ -7,7 +7,7 @@ use super::Deserialize;
 use super::Error as DeserializeError;
 
 #[derive(Deserialize)]
-struct Node<T> {
+struct Node<T: Deserialize> {
     value: T,
     next: usize,
 }

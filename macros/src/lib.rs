@@ -6,10 +6,7 @@ use proc_macro2::{Span, TokenStream};
 
 use quote::{quote, quote_spanned};
 use syn::spanned::Spanned;
-use syn::{
-    parse_macro_input, parse_quote, Data, DataStruct, DeriveInput,
-    GenericParam, Generics, Ident, Index,
-};
+use syn::{parse_macro_input, Data, DataStruct, DeriveInput, Ident, Index};
 
 #[proc_macro_derive(Deserialize)]
 pub fn derive_deserialize(
@@ -23,7 +20,7 @@ pub fn derive_deserialize(
         panic!("Deserialize can only be derived on structs");
     };
 
-    let generics = add_trait_bounds(input.generics);
+    let generics = input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let num_bytes = num_bytes_const(struct_data);
@@ -45,18 +42,6 @@ pub fn derive_deserialize(
     };
 
     expanded.into()
-}
-
-// Add a Deserialize bound to each type parameter
-fn add_trait_bounds(mut generics: Generics) -> Generics {
-    for param in &mut generics.params {
-        if let GenericParam::Type(ref mut type_param) = *param {
-            type_param.bounds.push(parse_quote!(
-                grub_split_library::deserialize::Deserialize
-            ));
-        }
-    }
-    generics
 }
 
 // Generate a const expression for NUM_BYTES
