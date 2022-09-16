@@ -34,6 +34,7 @@ pub struct GHashTable<K: Deserialize + MonoHash + Eq, V: Deserialize> {
 }
 
 impl<K: Deserialize + MonoHash + Eq, V: Deserialize> GHashTable<K, V> {
+    #[must_use]
     pub fn get(&self, key: &K) -> Option<&V> {
         let bucket = (key.hash() as usize) % self.table.value.len();
         let maybe_slot = &self.table.value[bucket].value;

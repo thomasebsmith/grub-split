@@ -16,13 +16,13 @@ fn read_c_string<M: MemoryReader>(
 
     let mut bytes: Vec<u8> = Vec::new();
 
-    for _ in 0..(MAX_STRING_LENGTH + 1) {
+    for _ in 0..=MAX_STRING_LENGTH {
         let byte = reader.read(AddressRange::<1> { start: next_addr })?[0];
         if byte == 0 {
             return Ok(String::from_utf8(bytes)?);
-        } else {
-            bytes.push(byte);
         }
+
+        bytes.push(byte);
 
         match next_addr.checked_add(1) {
             None => {

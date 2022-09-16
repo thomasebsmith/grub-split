@@ -12,10 +12,10 @@ fn invalid_input(desc: &str) -> io::Error {
 }
 
 fn usage(args: &[String]) -> io::Result<()> {
-    if !args.is_empty() {
-        eprintln!("Usage: {} <pid> <addr>", args[0]);
-    } else {
+    if args.is_empty() {
         eprintln!("Usage: <executable> <pid> <addr>");
+    } else {
+        eprintln!("Usage: {} <pid> <addr>", args[0]);
     }
     Err(invalid_input("bad args"))
 }

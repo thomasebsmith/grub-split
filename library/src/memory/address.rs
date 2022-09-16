@@ -5,14 +5,17 @@ use std::ops::Add;
 pub struct Address(usize);
 
 impl Address {
+    #[must_use]
     pub const fn new(raw: usize) -> Self {
         Self(raw)
     }
 
+    #[must_use]
     pub const fn raw(self) -> usize {
         self.0
     }
 
+    #[must_use]
     pub const fn align_forward(self, alignment: usize) -> Self {
         let alignment_mask = alignment - 1;
         let addr_in_correct_block = self.0 + alignment_mask;
@@ -21,10 +24,12 @@ impl Address {
     }
 
     // const_ops would be nice...
+    #[must_use]
     pub const fn add_const(self, offset: usize) -> Self {
         Self(self.0 + offset)
     }
 
+    #[must_use]
     pub const fn checked_add(self, offset: usize) -> Option<Self> {
         match self.0.checked_add(offset) {
             None => None,
@@ -53,6 +58,7 @@ pub struct AddressRange<const NUM_BYTES: usize> {
 }
 
 impl<const NUM_BYTES: usize> AddressRange<NUM_BYTES> {
+    #[must_use]
     pub fn contains<const OTHER_NUM_BYTES: usize>(
         self,
         other: AddressRange<OTHER_NUM_BYTES>,
@@ -69,6 +75,7 @@ pub struct VariableLengthAddressRange {
 }
 
 impl VariableLengthAddressRange {
+    #[must_use]
     pub fn contains(self, other: Self) -> bool {
         other.start >= self.start
             && other.start + other.num_bytes <= self.start + self.num_bytes
