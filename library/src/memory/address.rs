@@ -1,20 +1,28 @@
 use std::fmt;
 use std::ops::Add;
 
+/// A memory address used to identify a location in another process's memory.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Address(usize);
 
 impl Address {
+    /// Constructs a new `Address` referring to the byte offset `raw` in another
+    /// process's virtual memory.
     #[must_use]
     pub const fn new(raw: usize) -> Self {
         Self(raw)
     }
 
+    /// Gets the byte offset in virtual memory that this address represents.
     #[must_use]
     pub const fn raw(self) -> usize {
         self.0
     }
 
+    /// Constructs a new `Address` that is aligned to `alignment` by increasing
+    /// this address's internal virtual memory offset.
+    ///
+    /// `alignment` must be a power of 2.
     #[must_use]
     pub const fn align_forward(self, alignment: usize) -> Self {
         let alignment_mask = alignment - 1;
@@ -24,11 +32,18 @@ impl Address {
     }
 
     // const_ops would be nice...
+    /// Constructs a new `Address` that is `offset` bytes forward in memory from
+    /// this `Address`.
     #[must_use]
     pub const fn add_const(self, offset: usize) -> Self {
         Self(self.0 + offset)
     }
 
+    /// Attempts to create a new `Address` that is `offset` bytes forward in
+    /// memory from this `Address`, checking for overflow.
+    ///
+    /// Returns `None` if overflow would have occured or `Some(address)` if the
+    /// addition was successful.
     #[must_use]
     pub const fn checked_add(self, offset: usize) -> Option<Self> {
         match self.0.checked_add(offset) {
