@@ -1,7 +1,5 @@
 // Based on https://github.com/dtolnay/syn/blob/master/examples/heapsize/heapsize_derive/src/lib.rs
 
-#![feature(let_else)]
-
 use proc_macro2::{Span, TokenStream};
 
 use quote::{quote, quote_spanned};
