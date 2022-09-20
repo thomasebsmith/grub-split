@@ -67,12 +67,20 @@ impl fmt::Display for Address {
     }
 }
 
+/// A constant-length, contiguous range of bytes in another process's memory.
+///
+/// `NUM_BYTES` is the number of bytes included in the `AddressRange`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AddressRange<const NUM_BYTES: usize> {
+    /// The address where this range begins.
     pub start: Address,
 }
 
 impl<const NUM_BYTES: usize> AddressRange<NUM_BYTES> {
+    /// Checks whether `other` is contained entirely within this `AddressRange`.
+    ///
+    /// This will return true if and only if `other` starts no later than this
+    /// range and ends no earlier than this range.
     #[must_use]
     pub fn contains<const OTHER_NUM_BYTES: usize>(
         self,
@@ -83,13 +91,21 @@ impl<const NUM_BYTES: usize> AddressRange<NUM_BYTES> {
     }
 }
 
+/// A variable-length, contiguous range of bytes in another process's memory.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct VariableLengthAddressRange {
+    /// The address where this range begins.
     pub start: Address,
+
+    /// The number of bytes contained within this range.
     pub num_bytes: usize,
 }
 
 impl VariableLengthAddressRange {
+    /// Checks whether `other` is contained entirely within this `AddressRange`.
+    ///
+    /// This will return true if and only if `other` starts no later than this
+    /// range and ends no earlier than this range.
     #[must_use]
     pub fn contains(self, other: Self) -> bool {
         other.start >= self.start
