@@ -6,13 +6,26 @@ use std::{error, fmt, io};
 
 use crate::memory::Address;
 
+/// An error that occurs while attempting to deserialize a type from memory.
 #[derive(Debug)]
 pub enum Error {
+    /// Integer overflow occurred on an address while deserializing.
     AddressOverflowError(Address),
+
+    /// A string was not encoded correctly in memory.
     EncodingError(Utf8Error),
+
+    /// An integral type conversion failed.
     IntConversionError(TryFromIntError),
+
+    /// An IO error occurred while attempting to read memory.
     IoError(io::Error),
+
+    /// A pointer was unexpectedly null.
     NullPtrError(Address),
+
+    /// A sequence of characters expected to be null-terminated was not
+    /// terminated before reaching an implementation-dependent limit.
     UnterminatedCStringError(Address),
 }
 

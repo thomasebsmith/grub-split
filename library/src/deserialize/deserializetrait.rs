@@ -18,7 +18,10 @@ pub trait Deserialize: Sized {
     /// Attempts to deserialize an instance from memory starting at `address`
     /// using `reader`.
     ///
-    /// Returns an `Error` if this fails.
+    /// If `address` is not aligned to [`ALIGNMENT`](Deserialize::ALIGNMENT),
+    /// behavior is implementation-defined and may be erroneous.
+    ///
+    /// Returns an [`Error`](super::Error) if deserialization fails.
     fn deserialize<M: MemoryReader>(
         reader: &mut M,
         address: Address,
