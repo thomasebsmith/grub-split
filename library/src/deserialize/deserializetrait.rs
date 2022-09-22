@@ -6,10 +6,19 @@ use super::Error as DeserializeError;
 
 pub use grub_split_macros::*;
 
+/// Trait for types that can be deserialized from a fixed-length contiguous byte
+/// sequence.
 pub trait Deserialize: Sized {
+    /// The number of bytes that are required for deserialization.
     const NUM_BYTES: usize;
+
+    /// The required alignment of the bytes. Must be a power of two.
     const ALIGNMENT: usize;
 
+    /// Attempts to deserialize an instance from memory starting at `address`
+    /// using `reader`.
+    ///
+    /// Returns an `Error` if this fails.
     fn deserialize<M: MemoryReader>(
         reader: &mut M,
         address: Address,
