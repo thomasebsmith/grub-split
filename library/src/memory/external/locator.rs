@@ -10,11 +10,24 @@ struct Library {
     starting_address: Address,
 }
 
+/// Represents the locations of libraries in an external process's memory at
+/// a point in time.
 pub struct ExternalMemoryLocator {
     libraries: Vec<Library>,
 }
 
 impl ExternalMemoryLocator {
+    /// Finds the locations of all libraries in the memory of the process with
+    /// ID `pid`.
+    ///
+    /// This is an expensive operation.
+    ///
+    /// Locations are captured at the moment this function is called and are
+    /// not updated within an [`ExternalMemoryLocator`](ExternalMemoryLocator)
+    /// instance.
+    ///
+    /// Returns an IO error if the libraries could not be located (for example,
+    /// because no process with the given PID exists).
     pub fn new(pid: Pid) -> io::Result<Self> {
         let regions = get_process_maps(pid)?;
         let libraries: Vec<Library> = regions
@@ -31,6 +44,11 @@ impl ExternalMemoryLocator {
 }
 
 impl MemoryLocator for ExternalMemoryLocator {
+    /// Finds the location of the library with the name `library` in the
+    /// external process's memory.
+    ///
+    /// Returns an error if no such library existed at the time this instance
+    /// was created.
     fn locate(&mut self, library: &str) -> io::Result<Address> {
         self.libraries
             .iter()
