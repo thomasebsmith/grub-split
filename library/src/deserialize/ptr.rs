@@ -9,7 +9,6 @@ use super::LazyDeserialize;
 pub const PTR_NUM_BYTES: usize = std::mem::size_of::<usize>();
 pub const PTR_ALIGNMENT: usize = std::mem::align_of::<usize>();
 
-
 impl Deserialize for Option<Address> {
     const NUM_BYTES: usize = PTR_NUM_BYTES;
     const ALIGNMENT: usize = PTR_ALIGNMENT;
@@ -29,6 +28,9 @@ impl Deserialize for Option<Address> {
 }
 
 impl Deserialize for Address {
+    const NUM_BYTES: usize = PTR_NUM_BYTES;
+    const ALIGNMENT: usize = PTR_ALIGNMENT;
+
     fn deserialize<M: MemoryReader>(
         reader: &mut M,
         address: Address,
@@ -65,10 +67,12 @@ impl<T: Deserialize> Deserialize for Option<Ptr<T>> {
         reader: &mut M,
         address: Address,
     ) -> Result<Self, DeserializeError> {
-        Ok(Option::<Address>::deserialize(reader, address)?.map(|pointed_addr| Ptr {
-            address: pointed_addr,
-            deref_type: PhantomData,
-        }))
+        Ok(Option::<Address>::deserialize(reader, address)?.map(
+            |pointed_addr| Ptr {
+                address: pointed_addr,
+                deref_type: PhantomData,
+            },
+        ))
     }
 }
 

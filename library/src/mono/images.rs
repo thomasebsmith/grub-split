@@ -1,12 +1,18 @@
 use crate::deserialize::Error as DeserializeError;
 use crate::deserialize::{Deserialize, Eager, Ptr};
-use crate::memory::{MemoryLocator, MemoryReader};
+use crate::memory::{Address, MemoryLocator, MemoryReader};
 
-use super::GHashTable;
+use super::{GHashTable, MonoInternalHashTable};
 
 const MONO_LIBRARY_NAME: &str = "libmonobdwgc-2.0.dylib";
 const LOADED_IMAGES_OFFSET: usize = 0x0016_d638 + 0x0018_e978 + 0x10;
 
+const SIZE_OF_MONO_MUTEX: usize = 64;
+
+type MonoMutex = [u8; SIZE_OF_MONO_MUTEX];
+type MonoWrapperCaches = [Option<Address>; 21];
+
+#[must_use]
 fn has_flag(byte: u8, flag: u8) -> bool {
     byte & flag == flag
 }
@@ -20,17 +26,19 @@ pub struct MonoStreamHeader {
 #[derive(Deserialize)]
 pub struct MonoTableInfo {
     pub base: Option<Address>,
-    _rows_fields: u32,
+    rows_fields: u32,
     pub size_bitfield: u32,
 }
 
 impl MonoTableInfo {
+    #[must_use]
     pub fn rows(&self) -> u32 {
-        self._rows_fields >> 24
+        self.rows_fields >> 24
     }
 
+    #[must_use]
     pub fn row_size(&self) -> u32 {
-        self._rows_fields & 0b11111111
+        self.rows_fields & 0b1111_1111
     }
 }
 
@@ -39,15 +47,13 @@ const MONO_TABLE_NUM: usize = 56;
 #[derive(Deserialize)]
 pub struct Image {
     pub ref_count: i32,
-    pub storage: Option<Address>,
-    pub raw_data: Option<Address>,
+    pub raw_data_handle: Option<Address>,
     pub raw_data: Option<Address>,
     pub raw_data_len: u32,
-    _bitfields: [u8; 2],
+    bitfields: [u8; 2],
     pub name: String,
     pub assembly_name: Option<String>,
     pub module_name: Option<String>,
-    pub time_date_stamp: u32,
     pub version: Option<String>,
     pub md_version_major: i16,
     pub md_version_minor: i16,
@@ -88,6 +94,7 @@ pub struct Image {
     pub szarray_cache: Option<Address>,
     pub szarray_cache_lock: MonoMutex,
     pub native_func_wrapper_cache: Option<Address>,
+    pub runtime_invoke_vcall_cache: Option<Address>,
     pub wrapper_param_names: Option<Address>,
     pub array_accessor_cache: Option<Address>,
     pub ldfld_wrapper_cache: Option<Address>,
@@ -101,60 +108,96 @@ pub struct Image {
     pub property_hash: Option<Address>,
     pub reflection_info: Option<Address>,
     pub user_info: Option<Address>,
-    // ...
+    pub dll_map: Option<Address>,
+    pub interface_bitset: Option<Address>,
+    pub reflection_info_unregister_classes: Option<Address>,
+    pub image_sets: Option<Address>,
+    pub wrapper_caches: MonoWrapperCaches,
+    pub var_cache_fast: Option<Address>,
+    pub mvar_cache_fast: Option<Address>,
+    pub var_cache_slow: Option<Address>,
+    pub mvar_cache_slow: Option<Address>,
+    pub var_cache_constrained: Option<Address>,
+    pub mvar_cache_constrained: Option<Address>,
+    pub pinvoke_scopes: Option<Address>,
+    pub pinvoke_scope_filenames: Option<Address>,
+    pub loader: Option<Address>,
+    pub anonymous_generic_class_container: Option<Address>,
+    pub anonymous_generic_method_container: Option<Address>,
+    pub weak_fields_inited: bool,
+    pub weak_field_indexes: Option<Address>,
+    pub lock: MonoMutex,
 }
 
 impl Image {
+    #[must_use]
+    pub fn raw_buffer_used(&self) -> bool {
+        has_flag(self.bitfields[0], 0b1000_0000)
+    }
+
+    #[must_use]
+    pub fn raw_data_allocated(&self) -> bool {
+        has_flag(self.bitfields[0], 0b0100_0000)
+    }
+
+    #[must_use]
+    pub fn fileio_used(&self) -> bool {
+        has_flag(self.bitfields[0], 0b0010_0000)
+    }
+
+    #[must_use]
     pub fn dynamic(&self) -> bool {
-        has_flag(self._bitfields[0], 0b1000_0000)
+        has_flag(self.bitfields[0], 0b0001_0000)
     }
 
+    #[must_use]
     pub fn ref_only(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0100_0000)
+        has_flag(self.bitfields[0], 0b0000_1000)
     }
 
+    #[must_use]
     pub fn uncompressed_metadata(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0010_0000)
+        has_flag(self.bitfields[0], 0b0000_0100)
     }
 
+    #[must_use]
     pub fn metadata_only(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0001_0000)
+        has_flag(self.bitfields[0], 0b0000_0010)
     }
 
+    #[must_use]
     pub fn load_from_context(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0000_1000)
+        has_flag(self.bitfields[0], 0b0000_0001)
     }
 
+    #[must_use]
     pub fn checked_module_cctor(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0000_0100)
+        has_flag(self.bitfields[1], 0b1000_0000)
     }
 
+    #[must_use]
     pub fn has_module_cctor(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0000_0010)
+        has_flag(self.bitfields[1], 0b0100_0000)
     }
 
+    #[must_use]
     pub fn idx_string_wide(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0000_0001)
+        has_flag(self.bitfields[1], 0b0010_0000)
     }
 
-    pub fn metadata_only(&self) -> bool {
-        has_flag(self._bitfields[0], 0b0001_0000)
-    }
-
+    #[must_use]
     pub fn idx_guid_wide(&self) -> bool {
-        has_flag(self._bitfields[1], 0b1000_0000)
+        has_flag(self.bitfields[1], 0b0001_0000)
     }
 
+    #[must_use]
     pub fn idx_blob_wide(&self) -> bool {
-        has_flag(self._bitfields[1], 0b0100_0000)
+        has_flag(self.bitfields[1], 0b0000_1000)
     }
 
+    #[must_use]
     pub fn core_clr_platform_code(&self) -> bool {
-        has_flag(self._bitfields[1], 0b0010_0000)
-    }
-
-    pub fn minimal_delta(&self) -> bool {
-        has_flag(self._bitfields[1], 0b0001_0000)
+        has_flag(self.bitfields[1], 0b0000_0100)
     }
 }
 

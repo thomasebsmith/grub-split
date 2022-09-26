@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use crate::memory::{Address, MemoryReader};
 
-use super::ptr::{read_ptr, PTR_ALIGNMENT, PTR_NUM_BYTES};
+use super::ptr::{PTR_ALIGNMENT, PTR_NUM_BYTES};
 use super::Deserialize;
 use super::Error as DeserializeError;
 
@@ -43,10 +43,12 @@ impl<T: Deserialize> Deserialize for Option<ArrayPtr<T>> {
         reader: &mut M,
         address: Address,
     ) -> Result<Self, DeserializeError> {
-        Ok(read_ptr(reader, address)?.map(|pointed_addr| ArrayPtr {
-            address: pointed_addr,
-            deref_type: PhantomData,
-        }))
+        Ok(Option::<Address>::deserialize(reader, address)?.map(
+            |pointed_addr| ArrayPtr {
+                address: pointed_addr,
+                deref_type: PhantomData,
+            },
+        ))
     }
 }
 

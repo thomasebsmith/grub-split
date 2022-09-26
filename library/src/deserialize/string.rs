@@ -2,7 +2,7 @@ use std::option::Option;
 
 use crate::memory::{Address, AddressRange, MemoryReader};
 
-use super::ptr::{read_ptr, PTR_ALIGNMENT, PTR_NUM_BYTES};
+use super::ptr::{PTR_ALIGNMENT, PTR_NUM_BYTES};
 use super::Deserialize;
 use super::Error as DeserializeError;
 
@@ -43,7 +43,7 @@ impl Deserialize for Option<String> {
         reader: &mut M,
         address: Address,
     ) -> Result<Self, DeserializeError> {
-        match read_ptr(reader, address)? {
+        match Option::<Address>::deserialize(reader, address)? {
             None => Ok(None),
             Some(pointed_addr) => read_c_string(reader, pointed_addr).map(Some),
         }

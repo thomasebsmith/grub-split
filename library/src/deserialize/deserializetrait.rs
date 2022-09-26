@@ -56,3 +56,16 @@ deserialize_int_impl!(u64);
 deserialize_int_impl!(i64);
 deserialize_int_impl!(usize);
 deserialize_int_impl!(isize);
+
+impl Deserialize for bool {
+    const NUM_BYTES: usize = 1;
+    const ALIGNMENT: usize = 1;
+
+    fn deserialize<M: MemoryReader>(
+        reader: &mut M,
+        address: Address,
+    ) -> Result<Self, DeserializeError> {
+        let range = AddressRange::<1> { start: address };
+        Ok(reader.read(range)?[0] != 0)
+    }
+}
