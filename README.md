@@ -17,7 +17,7 @@ $ ./scripts/run.sh -- <pid> # (replace <pid> with a process ID to attach to)
 - Ability to log information about Hollow Knight game events on macOS
 
 ### v0.2
-- Memory reading performance improvements
+- Memory reading performance improvements (caching, latency analysis, etc.)
 - Basic autosplitting functionality on macOS
 
 ### v0.3
