@@ -29,13 +29,24 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut locator = ExternalMemoryLocator::new(pid)?;
     let mut reader = ExternalMemoryReader::from_pid(pid)?;
 
+    println!("Starting...");
     let loaded_images = LoadedImages::new(&mut locator, &mut reader)?;
+    println!("Found loaded images");
     let image =
         loaded_images.get_image("Assembly-CSharp").ok_or_else(|| {
             io::Error::new(io::ErrorKind::Other, "Image not found")
         })?;
+    println!("Found image");
+    let ns_cache = image.name_cache.value.get("").ok_or_else(|| {
+        io::Error::new(io::ErrorKind::Other, "Empty namespace not found")
+    })?;
+    println!("Found ns cache");
+    let type_token = ns_cache.value.get("GameManager").ok_or_else(|| {
+        io::Error::new(io::ErrorKind::Other, "GameManager type token not found")
+    })?;
 
     println!("name = {}", image.name);
+    println!("type token = {}", type_token);
 
     Ok(())
 }

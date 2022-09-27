@@ -2,6 +2,7 @@
 
 // _funcs are actually function pointers, but they are deserialized as usizes
 // since we don't need to use them.
+use core::borrow::Borrow;
 
 use std::collections::LinkedList;
 
@@ -35,14 +36,18 @@ pub struct GHashTable<K: Deserialize + MonoHash + Eq, V: Deserialize> {
 
 impl<K: Deserialize + MonoHash + Eq, V: Deserialize> GHashTable<K, V> {
     #[must_use]
-    pub fn get(&self, key: &K) -> Option<&V> {
+    pub fn get<B>(&self, key: &B) -> Option<&V>
+    where
+        K: Borrow<B>,
+        B: MonoHash + Eq + ?Sized,
+    {
         let bucket = (key.hash() as usize) % self.table.value.len();
         let maybe_slot = &self.table.value[bucket].value;
         match maybe_slot {
             None => None,
             Some(slot) => {
                 for pair in slot.iter() {
-                    if pair.key == *key {
+                    if *pair.key.borrow() == *key {
                         return Some(&pair.value);
                     }
                 }

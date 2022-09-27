@@ -1,6 +1,11 @@
+use std::io;
+
 use crate::deserialize::Error as DeserializeError;
 use crate::deserialize::{Deserialize, Eager, Ptr};
-use crate::memory::{Address, MemoryLocator, MemoryReader};
+use crate::memory::{
+    Address, MemoryLocator, MemoryReader, MemorySearcher,
+    VariableLengthAddressRange,
+};
 
 use super::{GHashTable, MonoInternalHashTable};
 
@@ -8,6 +13,8 @@ const MONO_LIBRARY_NAME: &str = "libmonobdwgc-2.0.dylib";
 const LOADED_IMAGES_OFFSET: usize = 0x0016_d638 + 0x0018_e978 + 0x10;
 
 const SIZE_OF_MONO_MUTEX: usize = 64;
+
+type GHashTablePtr<K, V> = Eager<Ptr<GHashTable<K, V>>>;
 
 type MonoMutex = [u8; SIZE_OF_MONO_MUTEX];
 type MonoWrapperCaches = [Option<Address>; 21];
@@ -88,7 +95,7 @@ pub struct Image {
     pub typespec_cache: Option<Address>,
     pub memberref_signatures: Option<Address>,
     pub method_signatures: Option<Address>,
-    pub name_cache: Option<Address>,
+    pub name_cache: GHashTablePtr<String, GHashTablePtr<String, u64>>,
     pub array_cache: Option<Address>,
     pub ptr_cache: Option<Address>,
     pub szarray_cache: Option<Address>,
@@ -201,7 +208,19 @@ impl Image {
     }
 }
 
-type ImageHashTable = Eager<Ptr<GHashTable<String, Eager<Ptr<Image>>>>>;
+type ImageHashTable = GHashTablePtr<String, Eager<Ptr<Image>>>;
+
+const MONO_TEXT_SECTION_PATTERN: [u8; 48] = [
+    0xcf, 0xfa, 0xed, 0xfe, 0x07, 0x00, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00,
+    0x06, 0x00, 0x00, 0x00, 0x13, 0x00, 0x00, 0x00, 0x48, 0x08, 0x00, 0x00,
+    0x85, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00,
+    0x78, 0x02, 0x00, 0x00, 0x5f, 0x5f, 0x54, 0x45, 0x58, 0x54, 0x00, 0x00,
+];
+
+const SEARCHER: MemorySearcher =
+    MemorySearcher::new(&MONO_TEXT_SECTION_PATTERN);
+
+const MAX_OFFSET_BYTES: usize = 1024 * 4096;
 
 pub struct LoadedImages {
     loaded_images_by_name: ImageHashTable,
@@ -212,20 +231,31 @@ impl LoadedImages {
         locator: &mut L,
         reader: &mut M,
     ) -> Result<Self, DeserializeError> {
-        Ok(Self {
-            loaded_images_by_name: ImageHashTable::deserialize(
+        let base_addr = locator.locate(MONO_LIBRARY_NAME)?;
+        println!("base addr is {}", base_addr);
+        let text_addr = SEARCHER
+            .search(
                 reader,
-                locator.locate(MONO_LIBRARY_NAME)? + LOADED_IMAGES_OFFSET,
-            )?,
+                VariableLengthAddressRange {
+                    start: base_addr,
+                    num_bytes: MAX_OFFSET_BYTES,
+                },
+            )?
+            .ok_or_else(|| {
+                io::Error::new(io::ErrorKind::Other, "TEXT signature not found")
+            })?;
+        println!("TEXT addr is {}", text_addr);
+
+        let addr = text_addr + LOADED_IMAGES_OFFSET;
+        println!("loaded images addr is {}", addr);
+        Ok(Self {
+            loaded_images_by_name: ImageHashTable::deserialize(reader, addr)?,
         })
     }
 
     #[must_use]
     pub fn get_image(&self, name: &str) -> Option<&Image> {
-        // TODO: this shouldn't be necessary
-        let name_string = String::from(name);
-
-        let eager_ptr = self.loaded_images_by_name.value.get(&name_string)?;
+        let eager_ptr = self.loaded_images_by_name.value.get(name)?;
         Some(&eager_ptr.value)
     }
 }

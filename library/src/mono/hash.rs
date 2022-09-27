@@ -3,7 +3,7 @@ pub trait Hash {
     fn hash(&self) -> u32;
 }
 
-impl Hash for String {
+impl Hash for str {
     fn hash(&self) -> u32 {
         let mut hash: u32 = 0;
 
@@ -20,5 +20,11 @@ impl Hash for String {
         hash = hash.wrapping_shl(5).wrapping_sub(hash);
 
         hash
+    }
+}
+
+impl Hash for String {
+    fn hash(&self) -> u32 {
+        self.as_str().hash()
     }
 }
