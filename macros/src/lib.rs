@@ -85,11 +85,23 @@ fn create_struct_expr(struct_data: &DataStruct) -> TokenStream {
     let initializers = Iterator::zip(struct_data.fields.iter().enumerate(), &identifiers)
         .map(|((i, field), ident)| {
         let ty = &field.ty;
+        let field_name_str = field.ident.as_ref().map_or_else(
+            || i.to_string(),
+            std::string::ToString::to_string,
+        );
         let extract_field = quote_spanned! { field.span() =>
             next_addr = next_addr.align_forward(<#ty>::ALIGNMENT);
             let #ident = grub_split_library::deserialize::Deserialize::deserialize(
                 reader,
-                next_addr)?;
+                next_addr).map_err(
+                    |err| grub_split_library::deserialize::Error::WithContext(
+                        Box::new(err),
+                        std::format!(
+                            "while deserializing {}",
+                            #field_name_str,
+                        )
+                    )
+                )?;
         };
         if i == struct_data.fields.len() - 1 {
             extract_field
@@ -104,12 +116,13 @@ fn create_struct_expr(struct_data: &DataStruct) -> TokenStream {
     let self_arguments =
         Iterator::zip(struct_data.fields.iter().enumerate(), &identifiers).map(
             |((i, field), ident)| {
-                if let Some(name) = &field.ident {
-                    quote!(#name: #ident)
-                } else {
-                    let index = Index::from(i);
-                    quote!(#index: #ident)
-                }
+                field.ident.as_ref().map_or_else(
+                    || {
+                        let index = Index::from(i);
+                        quote!(#index: #ident)
+                    },
+                    |name| quote!(#name: #ident),
+                )
             },
         );
 

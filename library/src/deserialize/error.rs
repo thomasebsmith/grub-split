@@ -27,6 +27,10 @@ pub enum Error {
     /// A sequence of characters expected to be null-terminated was not
     /// terminated before reaching an implementation-dependent limit.
     UnterminatedCStringError(Address),
+
+    /// An error with arbitrary context (e.g. the property where the error was
+    /// encountered)
+    WithContext(Box<Error>, String),
 }
 
 impl fmt::Display for Error {
@@ -43,6 +47,9 @@ impl fmt::Display for Error {
             }
             Self::UnterminatedCStringError(address) => {
                 write!(f, "Unterminated C string beginnning at {}", address)
+            }
+            Self::WithContext(error, context) => {
+                write!(f, "{}: {}", context, error)
             }
         }
     }

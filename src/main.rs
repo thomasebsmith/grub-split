@@ -1,56 +1,39 @@
 use std::error::Error;
 use std::io;
+use std::process::ExitCode;
 
-use log::{debug, trace};
+mod run;
 
-use grub_split_library::memory::external::{
-    ExternalMemoryLocator, ExternalMemoryReader,
-};
-use grub_split_library::mono::LoadedImages;
-
-fn invalid_input(desc: &str) -> io::Error {
+fn invalid_input(desc: String) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidInput, desc)
 }
 
-fn usage(args: &[String]) -> io::Result<()> {
+fn usage(args: &[String]) -> io::Error {
     if args.is_empty() {
-        eprintln!("Usage: <executable> <pid>");
+        invalid_input(String::from("Usage: <executable> <pid>"))
     } else {
-        eprintln!("Usage: {} <pid>", args[0]);
+        invalid_input(format!("Usage: {} <pid>", args[0]))
     }
-    Err(invalid_input("Invalid arguments"))
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
-    env_logger::init();
-
+fn parse_args_and_run() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 2 {
-        usage(args.as_slice())?;
+        return Err(Box::new(usage(args.as_slice())));
     }
 
     let pid: i32 = args[1].parse()?;
-    let mut locator = ExternalMemoryLocator::new(pid)?;
-    let mut reader = ExternalMemoryReader::from_pid(pid)?;
 
-    trace!("Starting...");
-    let loaded_images = LoadedImages::new(&mut locator, &mut reader)?;
-    trace!("Found loaded images");
-    let image =
-        loaded_images.get_image("Assembly-CSharp").ok_or_else(|| {
-            io::Error::new(io::ErrorKind::Other, "Image not found")
-        })?;
-    trace!("Found image");
-    let ns_cache = image.name_cache.value.get("").ok_or_else(|| {
-        io::Error::new(io::ErrorKind::Other, "Empty namespace not found")
-    })?;
-    trace!("Found ns cache");
-    let type_token = ns_cache.value.get("GameManager").ok_or_else(|| {
-        io::Error::new(io::ErrorKind::Other, "GameManager type token not found")
-    })?;
+    run::run(pid)
+}
 
-    debug!("name = {}", image.name);
-    debug!("type token = {}", type_token);
-
-    Ok(())
+fn main() -> ExitCode {
+    env_logger::init();
+    match parse_args_and_run() {
+        Ok(_) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("Error: {}", error);
+            ExitCode::FAILURE
+        }
+    }
 }
