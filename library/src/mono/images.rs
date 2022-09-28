@@ -1,5 +1,7 @@
 use std::io;
 
+use log::debug;
+
 use crate::deserialize::Error as DeserializeError;
 use crate::deserialize::{Deserialize, Eager, Ptr};
 use crate::memory::{
@@ -232,7 +234,7 @@ impl LoadedImages {
         reader: &mut M,
     ) -> Result<Self, DeserializeError> {
         let base_addr = locator.locate(MONO_LIBRARY_NAME)?;
-        println!("base addr is {}", base_addr);
+        debug!("base addr is {}", base_addr);
         let text_addr = SEARCHER
             .search(
                 reader,
@@ -244,10 +246,10 @@ impl LoadedImages {
             .ok_or_else(|| {
                 io::Error::new(io::ErrorKind::Other, "TEXT signature not found")
             })?;
-        println!("TEXT addr is {}", text_addr);
+        debug!("TEXT addr is {}", text_addr);
 
         let addr = text_addr + LOADED_IMAGES_OFFSET;
-        println!("loaded images addr is {}", addr);
+        debug!("loaded images addr is {}", addr);
         Ok(Self {
             loaded_images_by_name: ImageHashTable::deserialize(reader, addr)?,
         })

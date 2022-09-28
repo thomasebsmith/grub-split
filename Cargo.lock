@@ -163,7 +163,9 @@ checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
 name = "grub-split"
 version = "0.1.0"
 dependencies = [
+ "env_logger",
  "grub-split-library",
+ "log",
 ]
 
 [[package]]
@@ -171,6 +173,7 @@ name = "grub-split-library"
 version = "0.1.0"
 dependencies = [
  "grub-split-macros",
+ "log",
  "proc-maps",
  "read-process-memory",
 ]

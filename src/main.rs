@@ -1,6 +1,8 @@
 use std::error::Error;
 use std::io;
 
+use log::{debug, trace};
+
 use grub_split_library::memory::external::{
     ExternalMemoryLocator, ExternalMemoryReader,
 };
@@ -20,6 +22,8 @@ fn usage(args: &[String]) -> io::Result<()> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    env_logger::init();
+
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 2 {
         usage(args.as_slice())?;
@@ -29,24 +33,24 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut locator = ExternalMemoryLocator::new(pid)?;
     let mut reader = ExternalMemoryReader::from_pid(pid)?;
 
-    println!("Starting...");
+    trace!("Starting...");
     let loaded_images = LoadedImages::new(&mut locator, &mut reader)?;
-    println!("Found loaded images");
+    trace!("Found loaded images");
     let image =
         loaded_images.get_image("Assembly-CSharp").ok_or_else(|| {
             io::Error::new(io::ErrorKind::Other, "Image not found")
         })?;
-    println!("Found image");
+    trace!("Found image");
     let ns_cache = image.name_cache.value.get("").ok_or_else(|| {
         io::Error::new(io::ErrorKind::Other, "Empty namespace not found")
     })?;
-    println!("Found ns cache");
+    trace!("Found ns cache");
     let type_token = ns_cache.value.get("GameManager").ok_or_else(|| {
         io::Error::new(io::ErrorKind::Other, "GameManager type token not found")
     })?;
 
-    println!("name = {}", image.name);
-    println!("type token = {}", type_token);
+    debug!("name = {}", image.name);
+    debug!("type token = {}", type_token);
 
     Ok(())
 }
