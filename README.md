@@ -8,7 +8,8 @@ See [LICENSE](./LICENSE) and [THIRD\_PARTY](./THIRD_PARTY) for license details.
 ```sh
 $ git clone https://github.com/thomasebsmith/grub-split.git
 $ cd grub-split
-$ ./scripts/run.sh -- <pid> # (replace <pid> with a process ID to attach to)
+# Replace <pid> with the process ID of your Hollow Knight game:
+$ ./scripts/run.sh -- <pid>
 ```
 
 ## Roadmap
