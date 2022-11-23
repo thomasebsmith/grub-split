@@ -30,7 +30,14 @@ impl<T: Deserialize> ArrayPtr<T> {
         size: usize,
     ) -> Result<Vec<T>, DeserializeError> {
         (0..size)
-            .map(|index| self.nth_element(reader, index))
+            .map(|index| {
+                self.nth_element(reader, index).map_err(|error| {
+                    DeserializeError::WithContext(
+                        Box::new(error),
+                        format!("&[{}].{}", size, index),
+                    )
+                })
+            })
             .collect()
     }
 }

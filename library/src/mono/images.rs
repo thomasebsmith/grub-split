@@ -17,6 +17,7 @@ const LOADED_IMAGES_OFFSET: usize = 0x0016_d638 + 0x0018_e978 + 0x10;
 const SIZE_OF_MONO_MUTEX: usize = 64;
 
 type GHashTablePtr<K, V> = Eager<Ptr<GHashTable<K, V>>>;
+type MaybeGHashTablePtr<K, V> = Eager<Option<Ptr<GHashTable<K, V>>>>;
 
 type MonoMutex = [u8; SIZE_OF_MONO_MUTEX];
 type MonoWrapperCaches = [Option<Address>; 21];
@@ -26,13 +27,13 @@ fn has_flag(byte: u8, flag: u8) -> bool {
     byte & flag == flag
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct MonoStreamHeader {
     pub data: Option<Address>,
     pub size: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct MonoTableInfo {
     pub base: Option<Address>,
     rows_fields: u32,
@@ -96,8 +97,9 @@ pub struct Image {
     pub field_cache: Option<Address>,
     pub typespec_cache: Option<Address>,
     pub memberref_signatures: Option<Address>,
+    pub helper_signatures: Option<Address>,
     pub method_signatures: Option<Address>,
-    pub name_cache: GHashTablePtr<String, GHashTablePtr<String, u64>>,
+    pub name_cache: MaybeGHashTablePtr<String, GHashTablePtr<String, u64>>,
     pub array_cache: Option<Address>,
     pub ptr_cache: Option<Address>,
     pub szarray_cache: Option<Address>,

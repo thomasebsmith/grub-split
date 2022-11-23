@@ -1,7 +1,7 @@
 use crate::deserialize::Deserialize;
 use crate::memory::Address;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct MonoInternalHashTable {
     pub hash_func: Option<Address>,
     pub key_extract: Option<Address>,

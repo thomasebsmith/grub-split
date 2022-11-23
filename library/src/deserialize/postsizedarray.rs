@@ -1,4 +1,4 @@
-use crate::memory::MemoryReader;
+use crate::memory::{Address, MemoryReader};
 
 use super::Error as DeserializeError;
 use super::{ArrayPtr, Deserialize, LazyDeserialize};
@@ -9,7 +9,7 @@ where
     U: Copy + Deserialize + TryInto<usize>,
     DeserializeError: From<<U as TryInto<usize>>::Error>,
 {
-    array_ptr: ArrayPtr<T>,
+    array_ptr: Option<ArrayPtr<T>>,
     size: U,
 }
 
@@ -24,6 +24,20 @@ where
         &self,
         reader: &mut M,
     ) -> Result<Self::Deserialized, DeserializeError> {
-        self.array_ptr.deref(reader, self.size.try_into()?)
+        let size = self.size.try_into()?;
+
+        if size == 0 {
+            return Ok(vec![]);
+        }
+
+        if let Some(ref ptr) = self.array_ptr {
+            ptr.deref(reader, size)
+        } else {
+            // TODO: capture the actual address
+            Err(DeserializeError::WithContext(
+                Box::new(DeserializeError::NullPtrError(Address::new(0))),
+                format!("Null arrayptr in post-sized array with size {}", size),
+            ))
+        }
     }
 }

@@ -27,12 +27,15 @@ impl<'a> MemorySearcher<'a> {
         let mut addr = range.start;
         let end = range.start + range.num_bytes;
         while addr < end {
-            let data = reader.read_vec(VariableLengthAddressRange {
+            let maybe_data = reader.read_vec(VariableLengthAddressRange {
                 start: addr,
                 num_bytes: self.signature.len(),
-            })?;
-            if data == self.signature {
-                return Ok(Some(addr));
+            });
+
+            if let Ok(data) = maybe_data {
+                if data == self.signature {
+                    return Ok(Some(addr));
+                }
             }
             addr = addr + self.page_size;
         }

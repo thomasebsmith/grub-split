@@ -26,7 +26,14 @@ impl<T: Deserialize> Deserialize for LinkedList<T> {
 
         let mut next_node_addr = address;
         while next_node_addr.raw() != 0 {
-            let node = Node::<T>::deserialize(reader, next_node_addr)?;
+            let node = Node::<T>::deserialize(reader, next_node_addr).map_err(
+                |error| {
+                    DeserializeError::WithContext(
+                        Box::new(error),
+                        format!("LinkedList.{}", result.len()),
+                    )
+                },
+            )?;
             result.push_back(node.value);
             next_node_addr = Address::new(node.next);
         }

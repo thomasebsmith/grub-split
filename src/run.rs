@@ -21,9 +21,17 @@ pub fn run(pid: i32) -> Result<(), Box<dyn Error>> {
             io::Error::new(io::ErrorKind::Other, "Image not found")
         })?;
     trace!("Found image");
-    let ns_cache = image.name_cache.value.get("").ok_or_else(|| {
-        io::Error::new(io::ErrorKind::Other, "Empty namespace not found")
-    })?;
+    let ns_cache = image
+        .name_cache
+        .value
+        .as_ref()
+        .ok_or_else(|| {
+            io::Error::new(io::ErrorKind::Other, "Null namespace cache")
+        })?
+        .get("")
+        .ok_or_else(|| {
+            io::Error::new(io::ErrorKind::Other, "Empty namespace not found")
+        })?;
     trace!("Found ns cache");
     let type_token = ns_cache.value.get("GameManager").ok_or_else(|| {
         io::Error::new(io::ErrorKind::Other, "GameManager type token not found")

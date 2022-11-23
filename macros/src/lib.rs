@@ -23,7 +23,10 @@ pub fn derive_deserialize(
 
     let num_bytes = num_bytes_const(struct_data);
     let alignment = alignment_const(struct_data);
-    let create_struct = create_struct_expr(struct_data);
+
+    let struct_name_str = struct_name.to_string();
+    let create_struct =
+        create_struct_expr(struct_name_str.as_ref(), struct_data);
 
     let expanded = quote! {
         impl #impl_generics grub_split_library::deserialize::Deserialize for #struct_name #ty_generics #where_clause {
@@ -77,7 +80,10 @@ fn alignment_const(struct_data: &DataStruct) -> TokenStream {
     }
 }
 
-fn create_struct_expr(struct_data: &DataStruct) -> TokenStream {
+fn create_struct_expr(
+    struct_name: &str,
+    struct_data: &DataStruct,
+) -> TokenStream {
     let identifiers: Vec<Ident> = (0..struct_data.fields.len())
         .map(|i| Ident::new(&format!("field{}", i), Span::mixed_site()))
         .collect();
@@ -97,7 +103,8 @@ fn create_struct_expr(struct_data: &DataStruct) -> TokenStream {
                     |err| grub_split_library::deserialize::Error::WithContext(
                         Box::new(err),
                         std::format!(
-                            "while deserializing {}",
+                            "while deserializing {}.{}",
+                            #struct_name,
                             #field_name_str,
                         )
                     )

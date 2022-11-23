@@ -16,6 +16,12 @@ impl<T: Deserialize, const N: usize> Deserialize for [T; N] {
 
         std::array::try_from_fn(|index| {
             T::deserialize(reader, address + index * padded_element_size)
+                .map_err(|error| {
+                    DeserializeError::WithContext(
+                        Box::new(error),
+                        format!("[{}].{}", N, index),
+                    )
+                })
         })
     }
 }
