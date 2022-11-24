@@ -9,7 +9,7 @@ use crate::memory::{
     VariableLengthAddressRange,
 };
 
-use super::{GHashTable, MonoInternalHashTable};
+use super::{Class, GHashTable, MonoInternalHashTable};
 
 const MONO_LIBRARY_NAME: &str = "libmonobdwgc-2.0.dylib";
 const LOADED_IMAGES_OFFSET: usize = 0x0016_d638 + 0x0018_e978 + 0x10;
@@ -92,7 +92,7 @@ pub struct Image {
     pub aotid: [u8; 16],
     pub assembly: Option<Address>,
     pub method_cache: Option<Address>,
-    pub class_cache: MonoInternalHashTable,
+    pub class_cache: MonoInternalHashTable<Eager<Ptr<Class>>>,
     pub methodref_cache: Option<Address>,
     pub field_cache: Option<Address>,
     pub typespec_cache: Option<Address>,
