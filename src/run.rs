@@ -4,6 +4,7 @@ use std::io;
 use log::{debug, trace};
 
 use grub_split_library::deserialize::LazyDeserialize;
+use grub_split_library::memory::caching::CachingMemoryReader;
 use grub_split_library::memory::external::{
     ExternalMemoryLocator, ExternalMemoryReader,
 };
@@ -18,7 +19,9 @@ fn to_usize<T: TryInto<usize>>(
 pub fn run(pid: i32) -> Result<(), Box<dyn Error>> {
     trace!("Attaching to process");
     let mut locator = ExternalMemoryLocator::new(pid)?;
-    let mut reader = ExternalMemoryReader::from_pid(pid)?;
+    let mut reader = CachingMemoryReader::<_, 4096>::new(
+        ExternalMemoryReader::from_pid(pid)?,
+    );
 
     trace!("Finding loaded images");
     let loaded_images = LoadedImages::new(&mut locator, &mut reader)?;
