@@ -18,6 +18,9 @@ pub enum Error {
     /// An integral type conversion failed.
     IntConversionError(TryFromIntError),
 
+    /// Some object(s) or value(s) in memory are not in a valid state.
+    InvalidStateError(String),
+
     /// An IO error occurred while attempting to read memory.
     IoError(io::Error),
 
@@ -41,6 +44,7 @@ impl fmt::Display for Error {
             }
             Self::EncodingError(encoding_error) => encoding_error.fmt(f),
             Self::IntConversionError(convert_error) => convert_error.fmt(f),
+            Self::InvalidStateError(message) => write!(f, "{}", &message),
             Self::IoError(io_error) => io_error.fmt(f),
             Self::NullPtrError(address) => {
                 write!(f, "Unexpected null pointer at {}", address)

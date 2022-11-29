@@ -13,6 +13,16 @@ pub struct ArrayPtr<T: Deserialize> {
 }
 
 impl<T: Deserialize> ArrayPtr<T> {
+    #[must_use]
+    pub fn new(address: Address) -> Self {
+        Self {
+            address,
+            deref_type: PhantomData,
+        }
+    }
+}
+
+impl<T: Deserialize> ArrayPtr<T> {
     pub fn nth_element<M: MemoryReader>(
         &self,
         reader: &mut M,

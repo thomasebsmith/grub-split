@@ -60,18 +60,22 @@ pub fn run(pid: i32) -> Result<(), Box<dyn Error>> {
         .table
         .nth_element(&mut reader, type_def_token % class_cache_size)?
         .value;
-    while to_usize(class.type_token)? != type_def_token {
+    while to_usize(class.internals.type_token)? != type_def_token {
         trace!(
             "Found class {} with type def token {:x}",
-            &class.name,
-            class.type_token
+            &class.internals.name,
+            class.internals.type_token
         );
-        let Some(ptr) = class.next_class_cache else {
+        let Some(ptr) = class.internals.next_class_cache else {
             return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Class cache entry not found")));
         };
         class = ptr.deref(&mut reader)?;
     }
-    debug!("Found class with name {}", &class.name);
+    debug!("Found class with name {}", &class.internals.name);
+
+    let _instance_object =
+        class.get_static_field_object(&mut reader, "_instance")?;
+    debug!("Found GameManager._instance");
 
     Ok(())
 }

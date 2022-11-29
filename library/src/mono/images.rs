@@ -9,6 +9,7 @@ use crate::memory::{
     VariableLengthAddressRange,
 };
 
+use super::utils::has_flag;
 use super::{Class, GHashTable, MonoInternalHashTable};
 
 const MONO_LIBRARY_NAME: &str = "libmonobdwgc-2.0.dylib";
@@ -21,11 +22,6 @@ type MaybeGHashTablePtr<K, V> = Eager<Option<Ptr<GHashTable<K, V>>>>;
 
 type MonoMutex = [u8; SIZE_OF_MONO_MUTEX];
 type MonoWrapperCaches = [Option<Address>; 21];
-
-#[must_use]
-fn has_flag(byte: u8, flag: u8) -> bool {
-    byte & flag == flag
-}
 
 #[derive(Debug, Deserialize)]
 pub struct MonoStreamHeader {

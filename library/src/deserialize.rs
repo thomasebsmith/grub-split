@@ -8,6 +8,7 @@ mod linkedlist;
 mod postsizedarray;
 mod ptr;
 mod string;
+mod zerolengtharray;
 
 pub use arrayptr::ArrayPtr;
 pub use deserializetrait::Deserialize;
@@ -16,3 +17,4 @@ pub use error::Error;
 pub use lazy::LazyDeserialize;
 pub use postsizedarray::PostSizedArray;
 pub use ptr::Ptr;
+pub use zerolengtharray::ZeroLengthArray;
