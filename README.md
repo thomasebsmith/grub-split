@@ -14,7 +14,7 @@ $ ./scripts/run.sh -- <pid>
 
 ## Roadmap
 ### v0.1 (in progress)
-- Ability to analyze Mono memory on macOS
+- Ability to analyze Mono images, classes, and objects on macOS
 - Ability to log information about Hollow Knight game events on macOS
 
 ### v0.2
