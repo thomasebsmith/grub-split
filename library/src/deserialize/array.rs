@@ -19,7 +19,7 @@ impl<T: Deserialize, const N: usize> Deserialize for [T; N] {
                 .map_err(|error| {
                     DeserializeError::WithContext(
                         Box::new(error),
-                        format!("[{}].{}", N, index),
+                        format!("[{N}].{index}"),
                     )
                 })
         })

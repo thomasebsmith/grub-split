@@ -85,7 +85,7 @@ fn create_struct_expr(
     struct_data: &DataStruct,
 ) -> TokenStream {
     let identifiers: Vec<Ident> = (0..struct_data.fields.len())
-        .map(|i| Ident::new(&format!("field{}", i), Span::mixed_site()))
+        .map(|i| Ident::new(&format!("field{i}"), Span::mixed_site()))
         .collect();
 
     let initializers = Iterator::zip(struct_data.fields.iter().enumerate(), &identifiers)

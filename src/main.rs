@@ -32,7 +32,7 @@ fn main() -> ExitCode {
     match parse_args_and_run() {
         Ok(_) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("Error: {}", error);
+            eprintln!("Error: {error}");
             ExitCode::FAILURE
         }
     }

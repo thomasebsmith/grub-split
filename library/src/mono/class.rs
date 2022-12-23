@@ -124,8 +124,8 @@ impl ClassInternals {
         #[allow(clippy::absurd_extreme_comparisons)]
         if usize::from(runtime_info.max_domain) <= MONO_ROOT_DOMAIN {
             Err(DeserializeError::InvalidStateError(format!(
-                "max_domain [{}] is less than MONO_ROOT_DOMAIN [{}]",
-                runtime_info.max_domain, MONO_ROOT_DOMAIN,
+                "max_domain [{}] is less than MONO_ROOT_DOMAIN [{MONO_ROOT_DOMAIN}]",
+                runtime_info.max_domain,
             )))
         } else {
             Ok(Some(
@@ -165,7 +165,7 @@ impl Deserialize for Class {
                 internals.fields.nth_element(reader, i).map_err(|error| {
                     DeserializeError::WithContext(
                         Box::new(error),
-                        format!("fields.{}", i),
+                        format!("fields.{i}"),
                     )
                 })?;
             fields.insert(field.name.clone(), field);

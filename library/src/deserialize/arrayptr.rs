@@ -44,7 +44,7 @@ impl<T: Deserialize> ArrayPtr<T> {
                 self.nth_element(reader, index).map_err(|error| {
                     DeserializeError::WithContext(
                         Box::new(error),
-                        format!("&[{}].{}", size, index),
+                        format!("&[{size}].{index}"),
                     )
                 })
             })

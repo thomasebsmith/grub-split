@@ -36,7 +36,7 @@ where
             // TODO: capture the actual address
             Err(DeserializeError::WithContext(
                 Box::new(DeserializeError::NullPtrError(Address::new(0))),
-                format!("Null arrayptr in post-sized array with size {}", size),
+                format!("Null arrayptr in post-sized array with size {size}"),
             ))
         }
     }

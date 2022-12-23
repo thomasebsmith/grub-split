@@ -40,20 +40,20 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AddressOverflowError(address) => {
-                write!(f, "Overflow in address range starting at {}", address)
+                write!(f, "Overflow in address range starting at {address}")
             }
             Self::EncodingError(encoding_error) => encoding_error.fmt(f),
             Self::IntConversionError(convert_error) => convert_error.fmt(f),
             Self::InvalidStateError(message) => write!(f, "{}", &message),
             Self::IoError(io_error) => io_error.fmt(f),
             Self::NullPtrError(address) => {
-                write!(f, "Unexpected null pointer at {}", address)
+                write!(f, "Unexpected null pointer at {address}")
             }
             Self::UnterminatedCStringError(address) => {
-                write!(f, "Unterminated C string beginnning at {}", address)
+                write!(f, "Unterminated C string beginnning at {address}")
             }
             Self::WithContext(error, context) => {
-                write!(f, "{}: {}", context, error)
+                write!(f, "{context}: {error}")
             }
         }
     }
