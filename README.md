@@ -32,4 +32,5 @@ $ ./scripts/run.sh -- <pid>
 
 ### v0.5
 - Bug hardening
-- Compatibility with older Hollow Knight versions
+- Compatibility with older Hollow Knight versions (including 1.2.2.1 and
+  1.4.3.2)
