@@ -22,7 +22,7 @@ $ ./scripts/run.sh -- <pid>
 
 ### v0.2
 - Memory reading performance improvements (caching, latency analysis, etc.)
-- Basic autosplitting functionality on macOS
+- Basic autosplitting and load removal functionality on macOS
 
 ### v0.3
 - Improved timer integrations, possibly including LiveSplit integration
