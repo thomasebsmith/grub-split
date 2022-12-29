@@ -26,8 +26,9 @@ $ ./scripts/run.sh -- <pid>
 
 ### v0.3
 - Improved timer integrations, possibly including LiveSplit integration
-- Timings identical to ShootMe/LiveSplit.HollowKnight
-- Built-in splits compatible with ShootMe/LiveSplit.HollowKnight
+- ShootMe/LiveSplit.HollowKnight compatibility:
+  - Built-in splits compatible with ShootMe/LiveSplit.HollowKnight
+  - Timings identical to ShootMe/LiveSplit.HollowKnight
 
 ### v0.4
 - Basic autosplitting functionality on Linux
