@@ -31,7 +31,7 @@ $ ./scripts/run.sh -- <pid>
   - Timings identical to ShootMe/LiveSplit.HollowKnight
 
 ### v0.4
-- Basic autosplitting functionality on Linux
+- Full autosplitting support on Linux
 
 ### v0.5
 - Bug hardening
