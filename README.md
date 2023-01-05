@@ -38,3 +38,6 @@ $ ./scripts/run.sh -- <pid>
 - Bug hardening
 - Compatibility with older Hollow Knight versions (including 1.0.2.8, 1.2.2.1,
   and 1.4.3.2)
+
+### v1.0
+- Official approval for timing Hollow Knight speedruns
