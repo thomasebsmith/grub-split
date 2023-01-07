@@ -40,4 +40,4 @@ $ ./scripts/run.sh -- <pid>
   and 1.4.3.2)
 
 ### v1.0
-- Official approval for timing Hollow Knight speedruns
+- Official approval for timing Hollow Knight speedruns on macOS and Linux
