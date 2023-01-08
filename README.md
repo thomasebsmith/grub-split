@@ -35,6 +35,10 @@ $ ./scripts/run.sh -- <pid>
 - Full autosplitting support on Linux
 
 ### v0.5
+- Complex splits (combinations of different conditions, every room transition,
+  etc.)
+
+### v0.6
 - Bug hardening
 - Compatibility with older Hollow Knight versions (including 1.0.2.8, 1.2.2.1,
   and 1.4.3.2)
