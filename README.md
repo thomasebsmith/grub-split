@@ -35,8 +35,9 @@ $ ./scripts/run.sh -- <pid>
 - Full autosplitting support on Linux
 
 ### v0.5
-- Complex splits (combinations of different conditions, every room transition,
+- More types of splits (every room transition, player conditions, item pickups,
   etc.)
+- Complex splits (AND and OR combinations of any splits)
 
 ### v0.6
 - Bug hardening
