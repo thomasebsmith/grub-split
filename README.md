@@ -37,6 +37,7 @@ $ ./scripts/run.sh -- <pid>
 ### v0.5
 - More types of splits (every room transition, player conditions, item pickups,
   etc.)
+- Stateful splits
 - Complex splits (AND, OR, and NOT combinations of any splits)
 
 ### v0.6
