@@ -25,7 +25,8 @@ $ ./scripts/run.sh -- <pid>
 - Basic autosplitting and load removal functionality on macOS
 
 ### v0.3
-- Improved timer integrations, possibly including LiveSplit integration
+- Improved timer integrations, possibly including LiveSplit or LiveSplit One
+  integration
 - [ShootMe/LiveSplit.HollowKnight](https://github.com/ShootMe/LiveSplit.HollowKnight/)
   compatibility:
   - Compatible built-in splits
