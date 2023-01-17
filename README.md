@@ -14,6 +14,10 @@ $ cd grub-split
 $ ./scripts/run.sh -- <pid>
 ```
 
+## Contributing
+To contribute, please respond to an issue stating that you would like to create
+a pull request. Once your pull request is ready, it will be reviewed.
+
 ## Roadmap
 ### v0.1 (in progress)
 - Ability to analyze Mono images, classes, and objects on macOS
