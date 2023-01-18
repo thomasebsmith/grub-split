@@ -15,8 +15,12 @@ $ ./scripts/run.sh -- <pid>
 ```
 
 ## Contributing
-To contribute, please respond to an issue stating that you would like to create
-a pull request. Once your pull request is ready, it will be reviewed.
+To contribute, you can open new issues or create pull requests for existing
+issues.
+
+Before creating a pull request, please respond to the corresponding issue
+stating that you would like to create a pull request. Once your pull request is
+ready, it will be reviewed.
 
 ## Roadmap
 ### v0.1 (in progress)
