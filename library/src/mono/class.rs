@@ -203,9 +203,10 @@ impl Class {
             )
         })?;
         let Some(field) = self.fields.get(name) else {
-            return Err(DeserializeError::InvalidStateError(
-                format!("Field \"{}\" does not exist on class \"{}\"", name, &self.internals.name)
-            ));
+            return Err(DeserializeError::InvalidStateError(format!(
+                "Field \"{}\" does not exist on class \"{}\"",
+                name, &self.internals.name
+            )));
         };
         // TODO: perform safety checks (e.g. that field is static)
         Ok(static_field_data + field.offset.try_into()?)

@@ -67,7 +67,10 @@ pub fn run(pid: i32) -> Result<(), Box<dyn Error>> {
             class.internals.type_token
         );
         let Some(ptr) = class.internals.next_class_cache else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Class cache entry not found")));
+            return Err(Box::new(io::Error::new(
+                io::ErrorKind::Other,
+                "Class cache entry not found",
+            )));
         };
         class = ptr.deref(&mut reader)?;
     }
