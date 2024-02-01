@@ -22,6 +22,8 @@ Before creating a pull request, please respond to the corresponding issue
 stating that you would like to create a pull request. Once your pull request is
 ready, it will be reviewed.
 
+All contributions will be included under the MIT License.
+
 ## Roadmap
 ### v0.1 (in progress)
 - Ability to analyze Mono images, classes, and objects on macOS
